@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="647.0" prefWidth="745.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.geekbrains.network.ChatController">
+   <children>
+
+      <ListView fx:id="listViewClient" layoutX="14.0" layoutY="121.0" prefHeight="475.0" prefWidth="312.0" />
+      <TextArea fx:id="absolutPathClient" layoutX="14.0" layoutY="86.0" prefHeight="36.0" prefWidth="312.0" />
+      <TextArea fx:id="fileNameClient" layoutX="14.0" layoutY="596.0" prefHeight="36.0" prefWidth="312.0" />
+
+      <TextField fx:id="input" layoutY="8.0" onAction="#uploadFile" prefHeight="36.0" prefWidth="312.0" />
+
+      <Button fx:id="upload" onAction="#uploadFile"  text="Upload" layoutX="336.0" layoutY="124.0" mnemonicParsing="false"  prefHeight="36.0" prefWidth="66.0"  />
+      <Button fx:id="download" onAction="#download" text="Download" layoutX="333.0" layoutY="560.0" mnemonicParsing="false" prefHeight="36.0" prefWidth="71.0"  />
+
+      <ListView fx:id="listViewServer" layoutX="416.0" layoutY="124.0" prefHeight="475.0" prefWidth="312.0" />
+      <TextArea fx:id="absolutPathServer" layoutX="416.0" layoutY="88.0" prefHeight="38.0" prefWidth="312.0" />
+      <TextArea fx:id="fileNameServer" layoutX="416.0" layoutY="597.0" prefHeight="36.0" prefWidth="312.0" />
+
+
+   </children>
+</AnchorPane>
