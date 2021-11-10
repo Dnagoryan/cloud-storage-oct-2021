@@ -21,7 +21,7 @@ public class FileMessage extends AbstractMessage {
     private final boolean isFirstBatch;
     private final int endByteNum;
     private final boolean isFinishBatch;
-    private final int batchNumber;
+
 
 
     public FileMessage(String name,
@@ -29,14 +29,13 @@ public class FileMessage extends AbstractMessage {
                        byte[] bytes,
                        boolean isFirstBatch,
                        int endByteNum,
-                       boolean isFinishBatch, int batchNumber) {
+                       boolean isFinishBatch) {
         this.name = name;
         this.size = size;
         this.bytes = bytes;
         this.isFirstBatch = isFirstBatch;
         this.endByteNum = endByteNum;
         this.isFinishBatch = isFinishBatch;
-        this.batchNumber = batchNumber;
         setType(CommandType.FILE_MESSAGE);
     }
 }

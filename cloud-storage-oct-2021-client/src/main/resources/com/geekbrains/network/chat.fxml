@@ -10,7 +10,6 @@
       <TextArea fx:id="absolutPathClient" layoutX="14.0" layoutY="86.0" prefHeight="36.0" prefWidth="312.0" />
       <TextArea fx:id="fileNameClient" layoutX="14.0" layoutY="596.0" prefHeight="36.0" prefWidth="312.0" />
 
-      <TextField fx:id="input" layoutY="8.0" onAction="#uploadFile" prefHeight="36.0" prefWidth="312.0" />
 
       <Button fx:id="upload" onAction="#uploadFile"  text="Upload" layoutX="336.0" layoutY="124.0" mnemonicParsing="false"  prefHeight="36.0" prefWidth="66.0"  />
       <Button fx:id="download" onAction="#download" text="Download" layoutX="333.0" layoutY="560.0" mnemonicParsing="false" prefHeight="36.0" prefWidth="71.0"  />

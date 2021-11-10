@@ -1,0 +1,9 @@
+# Project exclude paths
+/cloud-storage-oct-2021-client/target/
+/cloud-storage-oct-2021-server/target/
+/common-cloud-oct-2021/target/
+/.idea/
+/cloud-storage-oct-2021-client/src/test/
+/cloud-storage-oct-2021-server/src/test/
+/cloud-storage-oct-2021-server/src/main/java/com/geekbrains/io/
+/cloud-storage-oct-2021-server/src/main/java/com/geekbrains/nio/

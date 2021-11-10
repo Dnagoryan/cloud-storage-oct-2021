@@ -43,7 +43,7 @@ public class ChatController implements Initializable {
     public TextArea absolutPathServer;
     public TextArea fileNameServer;
 
-    public TextField input;
+
     public Button upload;
     public Button download;
     private ObjectDecoderInputStream dis;
@@ -141,7 +141,7 @@ public class ChatController implements Initializable {
         long size = Files.size(filePath);
         try (FileInputStream is = new FileInputStream(filePath.toFile())) {
             int read;
-            int number = 0;
+
             while ((read = is.read(buffer)) != -1) {
                 FileMessage message = FileMessage.builder()
                         .bytes(buffer)
@@ -150,11 +150,10 @@ public class ChatController implements Initializable {
                         .isFirstBatch(isFirstBatch)
                         .isFinishBatch(is.available() <= 0)
                         .endByteNum(read)
-                        .batchNumber(++number)
                         .build();
 
                 net.send(message);
-
+                buffer = new byte[8192];
                 isFirstBatch = false;
 
             }
