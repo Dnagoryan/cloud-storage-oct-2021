@@ -1,20 +1,25 @@
-package com.geekbrains.network;
+package com.geekbrains.network.controllers;
 
 import com.geekbrains.model.AbstractMessage;
 import com.geekbrains.model.navigation.FileMessage;
 import com.geekbrains.model.navigation.FileRequest;
 import com.geekbrains.model.navigation.ListMessage;
+import com.geekbrains.network.App;
 import com.geekbrains.network.Net;
-import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.serialization.ObjectDecoderInputStream;
 import io.netty.handler.codec.serialization.ObjectEncoderOutputStream;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import lombok.Getter;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
@@ -24,13 +29,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.List;
+
 import java.util.ResourceBundle;
-import java.util.stream.Collectors;
+
 
 import static javafx.application.Platform.runLater;
 
 @Slf4j
+@Getter
 public class ChatController implements Initializable {
 
 
@@ -50,7 +56,7 @@ public class ChatController implements Initializable {
     private ObjectEncoderOutputStream dos;
     public static Net net;
     private byte[] buffer;
-    private File clintDir;
+    public MenuItem reg;
 
 
     @Override
@@ -58,11 +64,12 @@ public class ChatController implements Initializable {
 
         buffer = new byte[8192];
         currentDir = Paths.get("client");
-        clintDir = new File("client");
+
         net = Net.getInstance(this::processMessage);
 
         addViewListener(listViewClient, fileNameClient);
         addViewListener(listViewServer, fileNameServer);
+      //  addDialogActionListener();
 
 
     }
@@ -171,4 +178,21 @@ public class ChatController implements Initializable {
         System.out.println("ОБНОВИЛО!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         System.out.println(Arrays.toString(currentDir.toFile().list()));
     }
+
+//    private void addDialogActionListener() {
+//        reg.setOnAction(
+//                new EventHandler<ActionEvent>() {
+//                    @SneakyThrows
+//                    @Override
+//                    public void handle(ActionEvent event) {
+//                        final Stage auth = new Stage();
+//                        auth.initModality(Modality.APPLICATION_MODAL);
+//                        auth.initOwner(App.ps);
+//                        FXMLLoader loader = new FXMLLoader(getClass().getResource("chat.fxml"));
+//                        Parent parent = loader.load();
+//                        auth.setScene(new Scene(parent));
+//                        auth.show();
+//                    }
+//                });
+//    }
 }

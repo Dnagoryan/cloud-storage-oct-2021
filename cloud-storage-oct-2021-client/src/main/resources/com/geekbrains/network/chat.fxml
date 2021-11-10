@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane prefHeight="647.0" prefWidth="745.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.geekbrains.network.ChatController">
+<AnchorPane prefHeight="647.0" prefWidth="745.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.geekbrains.network.controllers.ChatController">
    <children>
 
       <ListView fx:id="listViewClient" layoutX="14.0" layoutY="121.0" prefHeight="475.0" prefWidth="312.0" />

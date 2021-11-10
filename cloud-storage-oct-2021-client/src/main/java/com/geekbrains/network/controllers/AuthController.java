@@ -1,4 +1,4 @@
-package com.geekbrains.network;
+package com.geekbrains.network.controllers;
 
 import com.geekbrains.model.AbstractMessage;
 import com.geekbrains.model.auth.Login;
@@ -8,11 +8,14 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import lombok.extern.slf4j.Slf4j;
 
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class Auth implements Initializable {
+
+@Slf4j
+public class AuthController implements Initializable {
 
     public TextField userName;
     public PasswordField password;
@@ -24,7 +27,7 @@ public class Auth implements Initializable {
 
     public void register(ActionEvent event) {
         if (userName.getText().length() >= 5 && password.getText().length() >= 5) {
-            AbstractMessage message = new Registration(userName.getText(), password.getText());
+            Registration message = new Registration(userName.getText(), password.getText());
             ChatController.net.send(message);
         } else {
             showAlert();
@@ -32,9 +35,10 @@ public class Auth implements Initializable {
     }
 
     public void login(ActionEvent event) {
-        if (userName.getText().length() >= 5 && password.getText().length() >= 5) {
-            AbstractMessage message = new Login(userName.getText(), password.getText());
+        if (userName.getText().length() >= 3 && password.getText().length() >= 3) {
+            Login message = new Login(userName.getText(), password.getText());
             ChatController.net.send(message);
+
         } else {
             showAlert();
         }

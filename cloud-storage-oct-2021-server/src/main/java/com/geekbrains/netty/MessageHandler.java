@@ -1,6 +1,7 @@
 package com.geekbrains.netty;
 
 import com.geekbrains.model.AbstractMessage;
+import com.geekbrains.model.auth.Login;
 import com.geekbrains.model.navigation.FileMessage;
 import com.geekbrains.model.navigation.FileRequest;
 import com.geekbrains.model.navigation.ListMessage;
@@ -20,6 +21,7 @@ public class MessageHandler extends SimpleChannelInboundHandler<AbstractMessage>
 
     private Path serverClientDir;
     private byte[] buffer;
+    private String userId;
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
@@ -33,14 +35,23 @@ public class MessageHandler extends SimpleChannelInboundHandler<AbstractMessage>
     protected void channelRead0(ChannelHandlerContext ctx, AbstractMessage msg) throws Exception {
         log.debug("Start processing {}", msg);
         switch (msg.getType()) {
-            case FILE_MESSAGE: {
+            case FILE_MESSAGE:
                 processFile((FileMessage) msg, ctx);
                 break;
-            }
             case FILE_REQUEST:
                 sendFile((FileRequest) msg, ctx);
                 break;
+            case LOGIN:
+                authentication((Login) msg, ctx);
+        }
+    }
 
+    private void authentication(Login msg, ChannelHandlerContext ctx) {
+        if (msg.getUsername().equals("admin") & msg.getPassword().equals("admin")) {
+            userId="1";
+            ctx.writeAndFlush(new FileRequest(userId));
+        }else {
+            ctx.writeAndFlush(new FileRequest(null));
         }
     }
 

@@ -45,6 +45,7 @@ public class Net {
                             }
                         });
                 future = bootstrap.connect(HOST, PORT).sync();
+
                 log.debug("Network start listening");
                 future.channel().closeFuture().sync();
             } catch (Exception e) {
