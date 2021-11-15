@@ -2,7 +2,6 @@ package com.geekbrains.network;
 
 
 import com.geekbrains.model.AbstractMessage;
-import com.geekbrains.model.navigation.FileMessage;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;

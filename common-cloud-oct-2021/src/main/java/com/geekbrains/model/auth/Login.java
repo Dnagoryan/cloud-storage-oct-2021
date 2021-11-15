@@ -2,7 +2,9 @@ package com.geekbrains.model.auth;
 
 import com.geekbrains.model.AbstractMessage;
 import com.geekbrains.model.CommandType;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 
@@ -11,15 +13,22 @@ import lombok.ToString;
 public class Login extends AbstractMessage {
 
 
-    private final String username;
-    private final String password;
+    private  String username;
+    private  String password;
+    private   String userId;
 
     public Login(String username,
-                 String password) {
+                 String password,
+                 String userId) {
         this.username = username;
         this.password = password;
+        this.userId=userId;
         setType(CommandType.LOGIN);
     }
+
+    public Login(){
+        setType(CommandType.LOGIN);
+}
 }
 
 

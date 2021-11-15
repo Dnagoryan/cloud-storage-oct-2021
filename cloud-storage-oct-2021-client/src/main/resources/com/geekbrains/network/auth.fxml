@@ -7,7 +7,7 @@
    <children>
       <PasswordField fx:id="password" layoutX="37.0" layoutY="105.0" prefHeight="25.0" prefWidth="258.0" />
       <TextField fx:id="userName" layoutX="37.0" layoutY="55.0" prefHeight="25.0" prefWidth="258.0" />
-      <Button onAction="#login" layoutX="37.0" layoutY="157.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="100.0" text="Login" />
-      <Button onAction="#register" layoutX="195.0" layoutY="157.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="100.0" text="Registration" />
+      <Button fx:id="login"  onAction="#auth" layoutX="37.0" layoutY="157.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="100.0" text="Login" />
+      <Button fx:id="register" onAction="#auth"  layoutX="195.0" layoutY="157.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="100.0" text="Registration" />
    </children>
 </AnchorPane>

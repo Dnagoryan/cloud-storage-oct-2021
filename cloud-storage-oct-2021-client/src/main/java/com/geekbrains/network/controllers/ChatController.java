@@ -1,26 +1,24 @@
 package com.geekbrains.network.controllers;
 
 import com.geekbrains.model.AbstractMessage;
+import com.geekbrains.model.auth.Login;
+import com.geekbrains.model.auth.Registration;
 import com.geekbrains.model.navigation.FileMessage;
 import com.geekbrains.model.navigation.FileRequest;
 import com.geekbrains.model.navigation.ListMessage;
 import com.geekbrains.network.App;
 import com.geekbrains.network.Net;
-import io.netty.handler.codec.serialization.ObjectDecoderInputStream;
-import io.netty.handler.codec.serialization.ObjectEncoderOutputStream;
+
+import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.fxml.FXMLLoader;
+import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import javafx.scene.control.MenuItem;
 
 import java.io.*;
 
@@ -39,8 +37,10 @@ import static javafx.application.Platform.runLater;
 @Getter
 public class ChatController implements Initializable {
 
+    @FXML
+    private Path clientDir;
+    private final String ROOT_DIR = "clients";
 
-    private Path currentDir;
     public ListView<String> listViewClient;
     public TextArea absolutPathClient;
     public TextArea fileNameClient;
@@ -49,30 +49,28 @@ public class ChatController implements Initializable {
     public TextArea absolutPathServer;
     public TextArea fileNameServer;
 
-
     public Button upload;
     public Button download;
-    private ObjectDecoderInputStream dis;
-    private ObjectEncoderOutputStream dos;
+
     public static Net net;
     private byte[] buffer;
     public MenuItem reg;
+    private String userId = null;
 
 
+    @SneakyThrows
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
         buffer = new byte[8192];
-        currentDir = Paths.get("client");
 
         net = Net.getInstance(this::processMessage);
-
         addViewListener(listViewClient, fileNameClient);
         addViewListener(listViewServer, fileNameServer);
-      //  addDialogActionListener();
 
 
     }
+
 
     private void processMessage(AbstractMessage message) throws IOException {
         log.debug("Start processing {}", message);
@@ -83,14 +81,62 @@ public class ChatController implements Initializable {
             case LIST_MESSAGE:
                 listMessage((ListMessage) message);
                 break;
-
-
+            case LOGIN:
+                login((Login) message);
+                break;
+            case REGISTRATION:
+                registration((Registration) message);
+                break;
         }
     }
 
+    private void registration(Registration message) {
+        runLater(()->{
+            userId = message.getUserId();
+            createClientDir(message.getUsername());
+            App.auth.close();
+        });
+    }
+
+
+    private void login(Login message) {
+        runLater(() -> {
+            if (message.getUserId() == null) {
+                showAlert();
+            } else {
+                userId = message.getUserId();
+                createClientDir(message.getUsername());
+                App.auth.close();
+            }
+        });
+    }
+
+    private void createClientDir(String username) {
+        clientDir=Paths.get(ROOT_DIR+"\\"+username);
+        if (!Files.exists(clientDir)) {
+            try {
+                Files.createDirectories(clientDir);
+            } catch (IOException ioException) {
+                ioException.printStackTrace();
+            }
+        }
+
+
+    }
+
+    private void showAlert() {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+
+        alert.setTitle("Error");
+        alert.setHeaderText("Password or login error");
+        alert.setContentText(" login or password are incorrect, try again");
+        alert.showAndWait();
+    }
+
+
     private void fileMessage(FileMessage message) throws IOException {
-        Path file = Paths.get(currentDir.toAbsolutePath() + "\\" + message.getName());
-        //      System.out.println(currentDir.resolve(message.getName()));
+        Path file = Paths.get(clientDir + "\\" + message.getName());
+
         if (message.isFirstBatch()) {
             Files.deleteIfExists(file);
 
@@ -109,11 +155,6 @@ public class ChatController implements Initializable {
         });
 
     }
-
-//    private List<String> getFilesInCurrentDir() throws IOException {
-//        return Files.list(currentDir).map(p -> p.getFileName().toString())
-//                .collect(Collectors.toList());
-//    }
 
 
     public void uploadFile(ActionEvent actionEvent) throws IOException {
@@ -142,8 +183,8 @@ public class ChatController implements Initializable {
 
     private void sendFile(String fileName) throws IOException {
         boolean isFirstBatch = true;
-        Path filePath = Paths.get(currentDir.toAbsolutePath() + "\\" + fileName);
-        System.out.println(currentDir.toAbsolutePath() + "\\" + fileName);
+        Path filePath = Paths.get(clientDir + "\\" + fileName);
+        System.out.println(clientDir + "\\" + fileName);
 
         long size = Files.size(filePath);
         try (FileInputStream is = new FileInputStream(filePath.toFile())) {
@@ -174,25 +215,9 @@ public class ChatController implements Initializable {
 
     private void refreshClient() {
         listViewClient.getItems().clear();
-        listViewClient.getItems().addAll(currentDir.toFile().list());
-        System.out.println("ОБНОВИЛО!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-        System.out.println(Arrays.toString(currentDir.toFile().list()));
+        listViewClient.getItems().addAll(clientDir.toFile().list());
     }
 
-//    private void addDialogActionListener() {
-//        reg.setOnAction(
-//                new EventHandler<ActionEvent>() {
-//                    @SneakyThrows
-//                    @Override
-//                    public void handle(ActionEvent event) {
-//                        final Stage auth = new Stage();
-//                        auth.initModality(Modality.APPLICATION_MODAL);
-//                        auth.initOwner(App.ps);
-//                        FXMLLoader loader = new FXMLLoader(getClass().getResource("chat.fxml"));
-//                        Parent parent = loader.load();
-//                        auth.setScene(new Scene(parent));
-//                        auth.show();
-//                    }
-//                });
-//    }
+
 }
+

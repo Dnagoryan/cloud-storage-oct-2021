@@ -2,12 +2,14 @@ package com.geekbrains.netty;
 
 import com.geekbrains.model.AbstractMessage;
 import com.geekbrains.model.auth.Login;
+import com.geekbrains.model.auth.Registration;
 import com.geekbrains.model.navigation.FileMessage;
 import com.geekbrains.model.navigation.FileRequest;
 import com.geekbrains.model.navigation.ListMessage;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
+
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -22,13 +24,13 @@ public class MessageHandler extends SimpleChannelInboundHandler<AbstractMessage>
     private Path serverClientDir;
     private byte[] buffer;
     private String userId;
+    private final String ROOT_DIR = "server";
+    DatabaseWorker dbWorker;
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        // создать для каждого клиента свою директорию!-=
-        serverClientDir = Paths.get("server");
-        ctx.writeAndFlush(new ListMessage(serverClientDir));
         buffer = new byte[8192];
+        dbWorker=new DatabaseWorker();
     }
 
     @Override
@@ -43,23 +45,48 @@ public class MessageHandler extends SimpleChannelInboundHandler<AbstractMessage>
                 break;
             case LOGIN:
                 authentication((Login) msg, ctx);
+                break;
+            case REGISTRATION:
+                registration((Registration) msg, ctx);
+                break;
         }
     }
 
-    private void authentication(Login msg, ChannelHandlerContext ctx) {
-        if (msg.getUsername().equals("admin") & msg.getPassword().equals("admin")) {
-            userId="1";
-            ctx.writeAndFlush(new FileRequest(userId));
-        }else {
-            ctx.writeAndFlush(new FileRequest(null));
+    private void registration(Registration msg, ChannelHandlerContext ctx) throws Exception {
+        userId = dbWorker.registration(msg.getUsername(), msg.getPassword());
+        log.debug(userId);
+        if (userId != null){
+            ctx.writeAndFlush(new Registration(msg.getUsername(), msg.getPassword(), userId));
+            createClientDir(msg.getUsername());
+            ctx.writeAndFlush(new ListMessage(serverClientDir));
+        }
+    }
+
+    private void authentication(Login msg, ChannelHandlerContext ctx) throws Exception {
+            userId=dbWorker.login(msg.getUsername(), msg.getPassword());
+        if (userId!=null) {
+            ctx.writeAndFlush(new Login(msg.getUsername(), msg.getPassword(), userId));
+            createClientDir(msg.getUsername());
+            ctx.writeAndFlush(new ListMessage(serverClientDir));
+        } else ctx.writeAndFlush(new Login());
+    }
+
+    private void createClientDir(String username) {
+
+        serverClientDir = Paths.get(ROOT_DIR + "\\" + username);
+        if (!Files.exists(serverClientDir)) {
+            try {
+                Files.createDirectories(serverClientDir);
+            } catch (IOException ioException) {
+                ioException.printStackTrace();
+            }
         }
     }
 
     private void sendFile(FileRequest msg, ChannelHandlerContext ctx) throws IOException {
         boolean isFirstBatch = true;
+
         Path filePath = serverClientDir.resolve(msg.getName());
-        System.out.println(serverClientDir.toAbsolutePath() + "\\" + msg.getName());
-        System.out.println(serverClientDir.resolve(msg.getName()));
         long size = Files.size(filePath);
         try (FileInputStream is = new FileInputStream(filePath.toFile())) {
             int read;
