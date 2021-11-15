@@ -3,6 +3,7 @@ package com.geekbrains.netty;
 import com.geekbrains.model.AbstractMessage;
 import com.geekbrains.model.auth.Login;
 import com.geekbrains.model.auth.Registration;
+import com.geekbrains.model.navigation.FileDelete;
 import com.geekbrains.model.navigation.FileMessage;
 import com.geekbrains.model.navigation.FileRequest;
 import com.geekbrains.model.navigation.ListMessage;
@@ -11,6 +12,7 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
 
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -49,7 +51,16 @@ public class MessageHandler extends SimpleChannelInboundHandler<AbstractMessage>
             case REGISTRATION:
                 registration((Registration) msg, ctx);
                 break;
+            case FILE_DELETE:
+                fileDelete((FileDelete)msg,ctx);
         }
+    }
+
+    private void fileDelete(FileDelete msg, ChannelHandlerContext ctx) throws Exception {
+        File delete = new File(serverClientDir + "\\" + msg.getName());
+        delete.delete();
+        ctx.writeAndFlush(new ListMessage(serverClientDir));
+
     }
 
     private void registration(Registration msg, ChannelHandlerContext ctx) throws Exception {

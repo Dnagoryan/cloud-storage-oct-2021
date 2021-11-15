@@ -3,18 +3,19 @@ package com.geekbrains.network.controllers;
 import com.geekbrains.model.AbstractMessage;
 import com.geekbrains.model.auth.Login;
 import com.geekbrains.model.auth.Registration;
+import com.geekbrains.model.navigation.FileDelete;
 import com.geekbrains.model.navigation.FileMessage;
 import com.geekbrains.model.navigation.FileRequest;
 import com.geekbrains.model.navigation.ListMessage;
 import com.geekbrains.network.App;
 import com.geekbrains.network.Net;
 
-import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseButton;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +27,6 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 
 import java.util.ResourceBundle;
 
@@ -46,7 +46,6 @@ public class ChatController implements Initializable {
     public TextArea fileNameClient;
 
     public ListView<String> listViewServer;
-    public TextArea absolutPathServer;
     public TextArea fileNameServer;
 
     public Button upload;
@@ -67,7 +66,7 @@ public class ChatController implements Initializable {
         net = Net.getInstance(this::processMessage);
         addViewListener(listViewClient, fileNameClient);
         addViewListener(listViewServer, fileNameServer);
-
+        setDoubleClickListener();
 
     }
 
@@ -91,7 +90,7 @@ public class ChatController implements Initializable {
     }
 
     private void registration(Registration message) {
-        runLater(()->{
+        runLater(() -> {
             userId = message.getUserId();
             createClientDir(message.getUsername());
             App.auth.close();
@@ -112,7 +111,7 @@ public class ChatController implements Initializable {
     }
 
     private void createClientDir(String username) {
-        clientDir=Paths.get(ROOT_DIR+"\\"+username);
+        clientDir = Paths.get(ROOT_DIR + "\\" + username);
         if (!Files.exists(clientDir)) {
             try {
                 Files.createDirectories(clientDir);
@@ -216,8 +215,53 @@ public class ChatController implements Initializable {
     private void refreshClient() {
         listViewClient.getItems().clear();
         listViewClient.getItems().addAll(clientDir.toFile().list());
+        absolutPathClient.clear();
+        absolutPathClient.appendText(clientDir.toFile().getAbsolutePath());
     }
 
+    public void setDoubleClickListener() {
+        listViewClient.setOnMouseClicked(event -> {
+            if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
+                if (new File(
+                        absolutPathClient.getText() +
+                                "\\" +
+                                listViewClient.getSelectionModel().getSelectedItem()).isDirectory()) {
+                    toDirectory(new ActionEvent());
+                }
+            }
+        });
+    }
+
+    public void toDirectory(ActionEvent event) {
+        if (Paths.get(clientDir.toFile().getAbsolutePath() +
+                "\\" + fileNameClient.getText()).toFile().isDirectory()) {
+            clientDir = Paths.get(clientDir + "\\" + fileNameClient.getText());
+            refreshClient();
+        }
+    }
+
+    public void fromDirectory(ActionEvent event) {
+        if (clientDir.getParent() != null) {
+            clientDir = clientDir.getParent();
+        } else {
+            clientDir = Paths.get(ROOT_DIR);
+        }
+        refreshClient();
+    }
+
+    public void deleteFileFromClient(ActionEvent actionEvent) {
+        if (!fileNameClient.getText().equals("")) {
+            File delete = new File(absolutPathClient.getText() + "\\" + fileNameClient.getText());
+            delete.delete();
+        }
+        refreshClient();
+    }
+
+    public void deleteFileFromServer(ActionEvent actionEvent) {
+        if (!fileNameServer.getText().equals("")) {
+            net.send(new FileDelete(fileNameServer.getText()));
+        }
+    }
 
 }
 
